@@ -20,7 +20,7 @@ namespace SampleBff.Controllers
       for (int i = 0; i < 10; i++)
       {
         var message = new MessageFromBff($"Message from BFF number {i}", DateTime.UtcNow);
-        await _client.PublishEventAsync("samplepubsub", "message-from-bff", message);
+        await _client.PublishEventAsync("pubsub", "message-from-bff", message);
       }
 
       return Accepted();

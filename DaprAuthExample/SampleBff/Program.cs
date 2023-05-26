@@ -1,9 +1,11 @@
+using Dapr.Client;
+using MessageContracts;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddDapr();
-builder.Services.AddDaprClient();
+builder.Services.AddControllers().AddDapr(); // Adds a DaprClient singleton for use in the app
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -17,11 +19,9 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
-
-//app.UseAuthorization();
-
 app.UseRouting();
+app.UseAuthorization();
+
 app.UseCloudEvents();
 app.MapSubscribeHandler();
 app.MapControllers();

@@ -9,7 +9,7 @@ namespace SampleProcessingService.Controllers
   public class MessageFromBffController : ControllerBase
   {
     [HttpPost]
-    [Topic("samplepubsub", "message-from-bff")]
+    [Topic("pubsub", "message-from-bff")]
     public IActionResult Post(MessageFromBff message)
     {
       Console.WriteLine(message.Description);
