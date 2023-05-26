@@ -1,0 +1,69 @@
+version: '3.4'
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  daprauthredis:
+    image: redis:latest
+    restart: unless-stopped
+    container_name: daprauthredis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - "10025:6379"
+      - "10026:8001"
+
+  samplebff:
+    image: ${DOCKER_REGISTRY-}samplebff
+    build:
+      context: .
+      dockerfile: SampleBff/Dockerfile
+    #environment:
+    #  - APP_API_TOKEN=109be48e-8eab-41a9-92a8-496656c9602f
+    depends_on: 
+      - daprauthredis
+
+  samplebff-dapr:
+    image: "daprio/daprd:latest"
+    command: [ 
+      "./daprd",
+      "-app-id", "samplebff",
+      "-app-port", "80",
+      "-components-path", "/DaprComponents",
+      "-log-level", "debug"
+    ]
+    volumes:
+      - "./DaprComponents/:/DaprComponents"
+    #environment:
+    #  - APP_API_TOKEN=109be48e-8eab-41a9-92a8-496656c9602f
+    depends_on: 
+      - samplebff
+    restart: always
+    
+  sampleprocessingservice:
+    image: ${DOCKER_REGISTRY-}sampleprocessingservice
+    build:
+      context: .
+      dockerfile: SampleProcessingService/Dockerfile
+    depends_on: 
+      - daprauthredis
+
+  sampleprocessingservice-dapr:
+    image: "daprio/daprd:latest"
+    command: [ 
+      "./daprd",
+      "-app-id", "sampleprocessingservice",
+      "-app-port", "80",
+      "-components-path", "/DaprComponents",
+      "-log-level", "debug"
+    ]
+    volumes:
+      - "./DaprComponents/:/DaprComponents"
+    #environment:
+    #  - APP_API_TOKEN=HERESATOKENFORYA
+    depends_on: 
+      - sampleprocessingservice
+    restart: always
+
